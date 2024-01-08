@@ -42,33 +42,34 @@ export async function signIn(req, res) {
     }
 }
 
-// export async function getUrlsByUser(req, res) {
-//     try {
-//         const userId = res.locals.session.rows[0].userId;
+export async function getUrlsByUser(req, res) {
+    try {
+        const { userId } = res.locals.session.rows[0];
 
-//         const data = await db.query(`
-//             SELECT users.id as "userId", users.name, urls.id as "urlId", urls."shortUrl", urls.url, urls."visitCount"
-//             FROM users
-//             JOIN urls ON users.id = urls."userId"
-//             WHERE users.id=$1
-//         `, [userId]);
+        const data = await db.query(`
+            SELECT users.id as "userId", users.name, urls.id as "urlId", urls."shortUrl", urls.url, urls."visitCount"
+            FROM users
+            JOIN urls ON users.id = urls."userId"
+            WHERE users.id = $1
+        `, [userId]);
 
-//         const { name, userId: id, rows } = data;
+        const { name, userId: id, rows } = data;
 
-//         const totalVisitCount = rows.reduce((acc, row) => acc + row.visitCount, 0);
-//         const shortenedUrls = rows.map(row => ({
-//             id: row.urlId,
-//             shortUrl: row.shortUrl,
-//             url: row.url,
-//             visitCount: row.visitCount
-//         }));
+        const totalVisitCount = rows.reduce((acc, row) => acc + row.visitCount, 0);
+        const shortenedUrls = rows.map(row => ({
+            id: row.urlId,
+            shortUrl: row.shortUrl,
+            url: row.url,
+            visitCount: row.visitCount
+        }));
 
-//         const responseObj = { id, name, visitCount: totalVisitCount, shortenedUrls };
+        const responseObj = { id, name, visitCount: totalVisitCount, shortenedUrls };
 
-//         res.json(responseObj);
-//     } catch (err) {
-//         handleServerError(res, err);
-//     }
-// }
+        res.json(responseObj);
+    } catch (err) {
+        console.error(err);
+        handleServerError(res, err);
+    }
+}
 
 
